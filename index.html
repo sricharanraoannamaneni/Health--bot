@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HealthAI Pro+</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg1:#e6f3ff; --bg2:#ffffff; --card:#ffffff; --muted:#6b7280;
+      --primary1:#0ea5e9; --primary2:#2563eb; --bubble:#f3fbff;
+      --user-grad: linear-gradient(90deg,#06b6d4,#3b82f6);
+      --success:#10b981; --warning:#f59e0b; --error:#ef4444;
+    }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(180deg,var(--bg1),var(--bg2));}
+    
+    /* Auth Pages */
+    .auth-container{display:flex;align-items:center;justify-content:center;height:100vh;background:linear-gradient(135deg,#0ea5e9,#2563eb);padding:20px}
+    .auth-box{background:white;border-radius:20px;padding:40px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,0.3);animation:slideUp 0.6s ease-out}
+    @keyframes slideUp{from{opacity:0;transform:translateY(40px)}to{opacity:1;transform:translateY(0)}}
+    .auth-header{text-align:center;margin-bottom:30px}
+    .auth-logo{width:60px;height:60px;background:linear-gradient(135deg,#0ea5e9,#2563eb);border-radius:14px;display:flex;align-items:center;justify-content:center;color:white;font-size:30px;margin:0 auto 16px}
+    .auth-title{font-size:24px;font-weight:700;color:#07385a;margin:0}
+    .auth-subtitle{font-size:14px;color:#6b7280;margin:8px 0 0 0}
+    .form-group{margin-bottom:16px}
+    .form-label{display:block;font-size:13px;font-weight:600;color:#07385a;margin-bottom:6px;text-transform:uppercase}
+    .form-input{width:100%;padding:12px 14px;border:1px solid #e6eef6;border-radius:10px;font-size:14px;font-family:Inter,system-ui,Arial;box-sizing:border-box;transition:all 0.2s}
+    .form-input:focus{outline:none;border-color:#0ea5e9;box-shadow:0 0 0 3px rgba(14,165,233,0.1)}
+    .form-input::placeholder{color:#cbd5e1}
+    .form-btn{width:100%;padding:12px;background:linear-gradient(90deg,#0ea5e9,#2563eb);color:white;border:none;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;transition:all 0.2s;box-shadow:0 4px 12px rgba(14,165,233,0.3)}
+    .form-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(14,165,233,0.4)}
+    .form-btn:active{transform:translateY(0)}
+    .form-link{text-align:center;font-size:13px;color:#6b7280;margin-top:16px}
+    .form-link a{color:#0ea5e9;text-decoration:none;font-weight:600;cursor:pointer}
+    .form-link a:hover{text-decoration:underline}
+    .guest-btn{width:100%;padding:12px;background:#f3f4f6;color:#07385a;border:1px solid #e6eef6;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;transition:all 0.2s;margin-top:12px}
+    .guest-btn:hover{background:#e6eef6}
+    .error-msg{background:#fee2e2;color:#991b1b;padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:16px;border-left:3px solid #ef4444;animation:slideIn 0.3s ease-out}
+    .success-msg{background:#dbeafe;color:#0b4a7a;padding:10px 12px;border-radius:8px;font-size:12px;margin-bottom:16px;border-left:3px solid #0ea5e9}
+    @keyframes slideIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+    
+    .page{display:none}
+    .page.active{display:block}
+    
+    /* App Container */
+    .container{max-width:1200px;margin:24px auto;padding:16px;display:grid;grid-template-columns:340px 1fr;gap:20px;height:calc(100vh - 72px);}
+    .panel{background:var(--card);border-radius:16px;padding:20px;box-shadow:0 10px 40px rgba(2,6,23,0.08);display:flex;flex-direction:column;}
+    .left{overflow-y:auto;}
+    .logo{display:flex;gap:12px;align-items:center;position:relative}
+    .logo .icon{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--primary1),var(--primary2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:20px}
+    .logo .title{font-weight:700;font-size:18px;color:#07385a}
+    [data-theme="dark"] .logo .title{color:#e2e8f0}
+    .subtitle{font-size:12px;color:var(--muted);margin-top:4px}
+    .user-section{background:linear-gradient(135deg,#f0f7ff,#f8faff);padding:12px;border-radius:8px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+    .user-name{font-size:12px;color:#07385a;font-weight:600}
+    .logout-btn{background:none;border:none;color:#ef4444;cursor:pointer;font-size:12px;font-weight:600}
+    .logout-btn:hover{text-decoration:underline}
+    .examples{margin-top:16px;display:flex;flex-direction:column;gap:8px}
+    .chip{padding:10px 12px;border-radius:10px;background:linear-gradient(135deg,#f0f7ff,#f8faff);color:var(--primary2);cursor:pointer;border:1px solid rgba(11,111,184,0.12);font-size:13px;font-weight:500;transition:all 0.2s;text-align:left}
+    .chip:hover{background:linear-gradient(135deg,#e0efff,#f0f8ff);transform:translateX(4px);box-shadow:0 4px 12px rgba(11,111,184,0.1)}
+    .section-label{font-weight:600;font-size:12px;text-transform:uppercase;color:var(--muted);margin-top:18px;margin-bottom:8px}
+    .features{font-size:12px;color:var(--muted);line-height:1.6}
+    .controls{display:flex;gap:8px;margin-top:16px}
+    .btn{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-weight:500;transition:all 0.2s;font-size:13px}
+    .btn.primary{background:linear-gradient(90deg,var(--primary1),var(--primary2));color:white;box-shadow:0 4px 12px rgba(14,165,233,0.3)}
+    .btn.primary:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(14,165,233,0.4)}
+    .btn.ghost{background:#eef2ff;color:#0b6fb8;border:1px solid rgba(11,111,184,0.1)}
+    .btn.ghost:hover{background:#e0e7ff}
+    .btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+    .chat{display:flex;flex-direction:column;gap:0;overflow:hidden;}
+    .chatHeader{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid #eef6ff;margin-bottom:12px;flex-shrink:0}
+    .headerInfo{display:flex;gap:12px;align-items:center}
+    .headerIcon{width:48px;height:48px;border-radius:12px;background:linear-gradient(135deg,var(--primary1),var(--primary2));display:flex;align-items:center;justify-content:center;color:white;font-weight:700}
+    .headerTitle{font-weight:700;font-size:15px;color:#07385a}
+    [data-theme="dark"] .headerTitle{color:#e2e8f0}
+    .headerMeta{font-size:12px;color:var(--muted)}
+    .headerControls{display:flex;gap:8px;align-items:center}
+    .iconBtn{background:transparent;border:1px solid #e6eef6;padding:8px;border-radius:10px;cursor:pointer;transition:all 0.2s;font-size:16px}
+    .iconBtn:hover{background:#f0f7ff;border-color:var(--primary1)}
+    .messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px;scroll-behavior:smooth;}
+    .msg{max-width:80%;padding:14px 16px;border-radius:14px;line-height:1.6;word-wrap:break-word;animation:fadeIn 0.4s ease-out}
+    .bot{background:var(--bubble);color:#e2e8f0;align-self:flex-start;box-shadow:0 4px 12px rgba(2,6,23,0.04);border-left:3px solid var(--primary1)}
+    .user{background:var(--user-grad);color:#fff;align-self:flex-end;box-shadow:0 4px 12px rgba(14,165,233,0.2)}
+    .bot strong{color:#0ea5e9;font-weight:600}
+    [data-theme="light"] .bot{color:#052d3a}
+    [data-theme="light"] .bot strong{color:var(--primary2)}
+    .msg-actions{display:flex;gap:6px;margin-top:6px;opacity:0;transition:opacity 0.2s;animation:slideInRight 0.3s ease-out 0.2s both}
+    .msg:hover .msg-actions{opacity:1}
+    .action-btn{background:rgba(0,0,0,0.1);color:inherit;border:none;padding:4px 8px;border-radius:6px;cursor:pointer;font-size:11px;transition:all 0.2s}
+    .action-btn:hover{background:rgba(0,0,0,0.2);transform:scale(1.05)}
+    .bot .action-btn{color:#0b6fb8}
+    .msg-time{font-size:11px;color:var(--muted);margin-top:4px;opacity:0.7;animation:fadeIn 0.5s ease-out 0.3s both}
+    .toast{position:fixed;bottom:20px;right:20px;background:var(--card);color:#07385a;padding:12px 16px;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,0.12);animation:slideIn 0.3s ease-out;z-index:1000}
+    .composer{display:flex;gap:10px;padding-top:12px;border-top:1px solid #eef6ff;align-items:flex-end;flex-shrink:0}
+    .input-wrapper{flex:1;display:flex;align-items:center;position:relative}
+    .input{flex:1;padding:12px 14px;border-radius:10px;border:1px solid #e6eef6;outline:none;font-size:14px;transition:all 0.2s;font-family:Inter,system-ui,Arial}
+    .input:focus{border-color:var(--primary1);box-shadow:0 0 0 3px rgba(14,165,233,0.1)}
+    .charCount{position:absolute;right:10px;font-size:11px;color:var(--muted)}
+    .disclaimer{font-size:12px;color:var(--muted);line-height:1.5;margin-top:16px;padding-top:16px;border-top:1px solid #eef6ff}
+    .status-badge{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success);margin-right:6px;animation:pulse-badge 2s infinite}
+    @keyframes pulse-badge{0%,100%{opacity:1}50%{opacity:0.5}}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes slideInRight{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+    
+    .messages::-webkit-scrollbar{width:8px}
+    .messages::-webkit-scrollbar-track{background:transparent}
+    .messages::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+    .messages::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+    .left::-webkit-scrollbar{width:8px}
+    .left::-webkit-scrollbar-track{background:transparent}
+    .left::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px}
+    .left::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+    [data-theme="dark"] .messages::-webkit-scrollbar-thumb{background:#475569}
+    [data-theme="dark"] .messages::-webkit-scrollbar-thumb:hover{background:#64748b}
+    [data-theme="dark"] .left::-webkit-scrollbar-thumb{background:#475569}
+    [data-theme="dark"] .left::-webkit-scrollbar-thumb:hover{background:#64748b}
+
+    @media (max-width:1024px){.container{grid-template-columns:1fr;height:auto;}}
+    @media (max-width:640px){
+      .container{padding:8px;margin:0;gap:12px}
+      .msg{max-width:95%}
+      .left{display:none}
+      .auth-box{padding:30px 20px}
+    }
+  </style>
+</head>
+<body>
+  <!-- Auth Page -->
+  <div id="authPage" class="page active">
+    <div class="auth-container">
+      <div class="auth-box">
+        <!-- Login Form -->
+        <div id="loginForm" class="auth-form">
+          <div class="auth-header">
+            <div class="auth-logo">⚕️</div>
+            <h1 class="auth-title">HealthAI Pro+</h1>
+            <p class="auth-subtitle">Medical Assistant</p>
+          </div>
+          <div id="loginError"></div>
+          <form onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="loginEmail" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="form-btn">Login</button>
+          </form>
+          <div class="form-link">
+            Don't have an account? <a onclick="showRegister()">Register</a>
+          </div>
+          <div class="form-link">
+            <a onclick="showForgot()">Forgot Password?</a>
+          </div>
+          <button class="guest-btn" onclick="loginAsGuest()">Continue as Guest</button>
+        </div>
+
+        <!-- Register Form -->
+        <div id="registerForm" class="auth-form" style="display:none">
+          <div class="auth-header">
+            <div class="auth-logo">⚕️</div>
+            <h1 class="auth-title">Create Account</h1>
+            <p class="auth-subtitle">Join HealthAI Pro+</p>
+          </div>
+          <div id="registerError"></div>
+          <form onsubmit="handleRegister(event)">
+            <div class="form-group">
+              <label class="form-label">Full Name</label>
+              <input type="text" class="form-input" id="registerName" placeholder="John Doe" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="registerEmail" placeholder="your@email.com" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input type="password" class="form-input" id="registerPassword" placeholder="••••••••" required minlength="6">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm Password</label>
+              <input type="password" class="form-input" id="registerConfirm" placeholder="••••••••" required minlength="6">
+            </div>
+            <button type="submit" class="form-btn">Register</button>
+          </form>
+          <div class="form-link">
+            Already have an account? <a onclick="showLogin()">Login</a>
+          </div>
+        </div>
+
+        <!-- Forgot Password Form -->
+        <div id="forgotForm" class="auth-form" style="display:none">
+          <div class="auth-header">
+            <div class="auth-logo">🔑</div>
+            <h1 class="auth-title">Reset Password</h1>
+            <p class="auth-subtitle">Enter your email to reset</p>
+          </div>
+          <div id="forgotError"></div>
+          <form onsubmit="handleForgot(event)">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="forgotEmail" placeholder="your@email.com" required>
+            </div>
+            <div id="forgotSuccess" class="success-msg" style="display:none">✅ Reset link sent to your email!</div>
+            <button type="submit" class="form-btn">Send Reset Link</button>
+          </form>
+          <div class="form-link">
+            <a onclick="showLogin()">Back to Login</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- App Page -->
+  <div id="appPage" class="page">
+    <div class="container">
+      <!-- LEFT PANEL -->
+      <div class="panel left">
+        <div class="logo">
+          <div class="icon">⚕️</div>
+          <div>
+            <div class="title">HealthAI Pro+</div>
+            <div class="subtitle">Medical Information</div>
+          </div>
+        </div>
+
+        <div id="userSection" class="user-section" style="display:none">
+          <div>
+            <div class="user-name" id="userNameDisplay">Guest User</div>
+            <div style="font-size:11px;color:#6b7280">Logged in</div>
+          </div>
+          <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+
+        <div style="margin-top:12px">
+          <div class="section-label">Try Examples</div>
+          <div class="examples" id="examples">
+            <div class="chip" data-q="Tell me about malaria">🦟 Tell me about malaria</div>
+            <div class="chip" data-q="Symptoms of dengue">🤒 Symptoms of dengue</div>
+            <div class="chip" data-q="What is jock itch?">🔴 What is jock itch?</div>
+            <div class="chip" data-q="Loose motions causes and prevention">⚠️ Loose motions causes</div>
+            <div class="chip" data-q="How to prevent typhoid?">💉 How to prevent typhoid?</div>
+          </div>
+        </div>
+
+        <div class="section-label">Features</div>
+        <div class="features">
+          ✓ AI-powered answers<br/>
+          ✓ Voice input support<br/>
+          ✓ Dark/Light theme<br/>
+          ✓ Chat history saved<br/>
+          ✓ Export & clear options
+        </div>
+
+        <div class="controls">
+          <button class="btn ghost" id="downloadBtn">📥 Download</button>
+          <button class="btn primary" id="clearBtn">🗑️ Clear</button>
+        </div>
+
+        <div class="disclaimer">
+          <strong>⚠️ Disclaimer:</strong> This chatbot provides informational content only and is not a substitute for professional medical advice. Always consult a healthcare provider.
+        </div>
+      </div>
+
+      <!-- CHAT PANEL -->
+      <div class="panel chat">
+        <div class="chatHeader">
+          <div class="headerInfo">
+            <div class="headerIcon">⚕️</div>
+            <div>
+              <div class="headerTitle">HealthAI Pro+ — Medical Assistant</div>
+              <div class="headerMeta"><span class="status-badge"></span>Online • Ask about diseases, symptoms & prevention</div>
+            </div>
+          </div>
+          <div class="headerControls">
+            <button id="voiceBtn" class="iconBtn" title="Voice input (EN-IN)">🎙️</button>
+            <button id="themeBtn" class="iconBtn" title="Toggle dark/light theme">🌓</button>
+          </div>
+        </div>
+
+        <div class="messages" id="messages"></div>
+
+        <div class="composer">
+          <div class="input-wrapper">
+            <input id="input" class="input" placeholder="Ask about any disease, symptom, or prevention method..." maxlength="500" />
+            <span class="charCount" id="charCount"></span>
+          </div>
+          <button id="send" class="btn primary">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// Auth Variables
+let currentUser = JSON.parse(localStorage.getItem('hap_currentUser') || 'null');
+let users = JSON.parse(localStorage.getItem('hap_users') || '[]');
+
+// App Variables
+let history = JSON.parse(localStorage.getItem('hap_history') || '[]');
+let recognition = null;
+let listening = false;
+let isWaitingResponse = false;
+
+const savedTheme = localStorage.getItem('hap_theme') || 'light';
+
+// Auth Functions
+function showLogin() {
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('forgotForm').style.display = 'none';
+  document.getElementById('loginError').innerHTML = '';
+}
+
+function showRegister() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'block';
+  document.getElementById('forgotForm').style.display = 'none';
+  document.getElementById('registerError').innerHTML = '';
+}
+
+function showForgot() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('registerForm').style.display = 'none';
+  document.getElementById('forgotForm').style.display = 'block';
+  document.getElementById('forgotError').innerHTML = '';
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  
+  const user = users.find(u => u.email === email && u.password === password);
+  
+  if (user) {
+    currentUser = user;
+    localStorage.setItem('hap_currentUser', JSON.stringify(user));
+    enterApp();
+  } else {
+    document.getElementById('loginError').innerHTML = '<div class="error-msg">❌ Invalid email or password</div>';
+  }
+}
+
+function handleRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('registerName').value;
+  const email = document.getElementById('registerEmail').value;
+  const password = document.getElementById('registerPassword').value;
+  const confirm = document.getElementById('registerConfirm').value;
+  
+  if (password !== confirm) {
+    document.getElementById('registerError').innerHTML = '<div class="error-msg">❌ Passwords do not match</div>';
+    return;
+  }
+  
+  if (users.some(u => u.email === email)) {
+    document.getElementById('registerError').innerHTML = '<div class="error-msg">❌ Email already exists</div>';
+    return;
+  }
+  
+  const newUser = { id: Date.now(), name, email, password, createdAt: new Date().toISOString() };
+  users.push(newUser);
+  localStorage.setItem('hap_users', JSON.stringify(users));
+  
+  document.getElementById('registerError').innerHTML = '<div class="success-msg">✅ Account created! Please login.</div>';
+  setTimeout(() => showLogin(), 1500);
+}
+
+function handleForgot(e) {
+  e.preventDefault();
+  const email = document.getElementById('forgotEmail').value;
+  
+  if (users.some(u => u.email === email)) {
+    document.getElementById('forgotSuccess').style.display = 'block';
+    document.getElementById('forgotEmail').value = '';
+    setTimeout(() => showLogin(), 2000);
+  } else {
+    document.getElementById('forgotError').innerHTML = '<div class="error-msg">❌ Email not found</div>';
+  }
+}
+
+function loginAsGuest() {
+  currentUser = { id: 'guest_' + Date.now(), name: 'Guest User', email: 'guest@example.com', isGuest: true };
+  localStorage.setItem('hap_currentUser', JSON.stringify(currentUser));
+  enterApp();
+}
+
+function enterApp() {
+  document.getElementById('authPage').classList.remove('active');
+  document.getElementById('appPage').classList.add('active');
+  applyTheme(savedTheme);
+  initializeApp();
+}
+
+function logout() {
+  if (confirm('Are you sure you want to logout?')) {
+    currentUser = null;
+    localStorage.removeItem('hap_currentUser');
+    document.getElementById('appPage').classList.remove('active');
+    document.getElementById('authPage').classList.add('active');
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+    showLogin();
+  }
+}
+
+function initializeApp() {
+  const userSection = document.getElementById('userSection');
+  const userNameDisplay = document.getElementById('userNameDisplay');
+  
+  if (currentUser.isGuest) {
+    userSection.style.display = 'flex';
+    userNameDisplay.textContent = 'Guest User (No account)';
+  } else {
+    userSection.style.display = 'flex';
+    userNameDisplay.textContent = currentUser.name;
+  }
+  
+  setupApp();
+}
+
+// App Functions
+function setupApp() {
+  const messagesEl = document.getElementById('messages');
+  const inputEl = document.getElementById('input');
+  const charCountEl = document.getElementById('charCount');
+  const sendBtn = document.getElementById('send');
+  const voiceBtn = document.getElementById('voiceBtn');
+  const themeBtn = document.getElementById('themeBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const clearBtn = document.getElementById('clearBtn');
+
+  // Render saved history
+  history.forEach(h => renderMessage(h.text, h.from, false));
+  if (history.length === 0) {
+    renderMessage("👋 Hello! I'm HealthAI Pro+. Ask me about diseases, symptoms, prevention methods, or treatments. I provide informational content only.", 'bot', false);
+  }
+
+  // Events
+  sendBtn.addEventListener('click', sendMessage);
+  inputEl.addEventListener('keydown', (e) => { 
+    if (e.key === 'Enter' && !e.shiftKey) { 
+      e.preventDefault(); 
+      sendMessage(); 
+    } 
+  });
+  inputEl.addEventListener('input', () => {
+    const len = inputEl.value.length;
+    charCountEl.textContent = len > 0 ? `${len}/500` : '';
+  });
+
+  document.querySelectorAll('.chip').forEach(ch => {
+    ch.addEventListener('click', () => {
+      const q = ch.getAttribute('data-q'); 
+      inputEl.value = q; 
+      inputEl.focus();
+      sendMessage();
+    });
+  });
+
+  downloadBtn.addEventListener('click', () => {
+    if (history.length === 0) {
+      alert('No chat history to download');
+      return;
+    }
+    const blob = new Blob([JSON.stringify(history, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); 
+    a.href = url; 
+    a.download = `healthai_${new Date().toISOString().split('T')[0]}.json`; 
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  clearBtn.addEventListener('click', () => {
+    if (!confirm('Clear all chat history? This action cannot be undone.')) return;
+    history = []; 
+    messagesEl.innerHTML = '';
+    renderMessage("👋 Hello! I'm HealthAI Pro+. Ask me about diseases, symptoms, prevention methods, or treatments.", 'bot', false);
+    showToast('🗑️ Chat cleared');
+  });
+
+  // Voice Recognition
+  if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    recognition = new SR();
+    recognition.lang = 'en-IN';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+    recognition.onstart = () => { listening = true; voiceBtn.style.opacity = 0.6; };
+    recognition.onresult = (e) => {
+      const text = e.results[0][0].transcript;
+      inputEl.value = text; 
+      sendMessage();
+    };
+    recognition.onend = () => { listening = false; voiceBtn.style.opacity = 1; };
+    recognition.onerror = (e) => { 
+      listening = false; 
+      voiceBtn.style.opacity = 1;
+      if (e.error !== 'no-speech') {
+        renderMessage(`🎙️ Voice error: ${e.error}`, 'bot', true);
+      }
+    };
+  } else {
+    voiceBtn.disabled = true; 
+    voiceBtn.title = 'Voice input not supported on this device';
+  }
+
+  voiceBtn.addEventListener('click', () => {
+    if (!recognition) return;
+    if (listening) { 
+      recognition.stop(); 
+    } else { 
+      recognition.start(); 
+    }
+  });
+
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+    const nxt = cur === 'dark' ? 'light' : 'dark';
+    applyTheme(nxt);
+  });
+
+  async function sendMessage() {
+    const text = inputEl.value.trim();
+    if (!text || isWaitingResponse) return;
+    
+    appendAndSave(text, 'user');
+    inputEl.value = '';
+    charCountEl.textContent = '';
+    
+    isWaitingResponse = true;
+    sendBtn.disabled = true;
+    
+    const typingId = appendTyping();
+    try {
+      const res = await fetch('/ask', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ message: text })
+      });
+      
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+      
+      const data = await res.json();
+      removeTyping(typingId);
+      
+      const finalText = data.reply || data.response || data.replyText || (typeof data === 'string' ? data : '') || 'No response received';
+      await renderTypingText(finalText);
+    } catch (err) {
+      removeTyping(typingId);
+      const errorMsg = err.message.includes('Failed to fetch') 
+        ? '⚠️ Connection failed. Ensure the server is running.' 
+        : `⚠️ Error: ${err.message}`;
+      renderMessage(errorMsg, 'bot', true);
+      console.error('Error:', err);
+    } finally {
+      isWaitingResponse = false;
+      sendBtn.disabled = false;
+    }
+  }
+
+  function appendAndSave(text, from) {
+    renderMessage(text, from, true);
+    history.push({ from, text, ts: new Date().toISOString() });
+    localStorage.setItem('hap_history', JSON.stringify(history));
+  }
+
+  function renderMessage(text, from, save) {
+    const el = document.createElement('div');
+    el.className = 'msg ' + (from === 'user' ? 'user' : 'bot');
+    const formatted = escapeHtml(text).replace(/\n/g,'<br>');
+    const time = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+    
+    let content = (from === 'bot' ? '<strong>HealthAI Pro+:</strong><br/>' : '') + formatted;
+    
+    if (from === 'bot') {
+      content += `<div class="msg-actions">
+        <button class="action-btn copy-btn" title="Copy to clipboard">📋 Copy</button>
+      </div>
+      <div class="msg-time">${time}</div>`;
+    } else {
+      content += `<div class="msg-time">${time}</div>`;
+    }
+    
+    el.innerHTML = content;
+    
+    // Copy button
+    el.querySelector('.copy-btn')?.addEventListener('click', () => {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('✅ Copied to clipboard');
+      });
+    });
+    
+    messagesEl.appendChild(el);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  function escapeHtml(s) { 
+    return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); 
+  }
+
+  function appendTyping() {
+    const id = 'tp-' + Date.now();
+    const el = document.createElement('div'); 
+    el.id = id; 
+    el.className = 'msg bot';
+    el.innerHTML = '<span class="typing"><strong>HealthAI Pro+:</strong> <div class="dot"></div><div class="dot"></div><div class="dot"></div></span>';
+    messagesEl.appendChild(el); 
+    messagesEl.scrollTop = messagesEl.scrollHeight; 
+    return id;
+  }
+
+  function removeTyping(id) { 
+    const el = document.getElementById(id); 
+    if(el) el.remove(); 
+  }
+
+  async function renderTypingText(text) {
+    const el = document.createElement('div'); 
+    el.className = 'msg bot'; 
+    messagesEl.appendChild(el);
+
+    const words = (text || '').split(/\s+/);
+    let displayed = '';
+    for (let i = 0; i < words.length; i++) {
+      displayed += (i===0?'':' ') + words[i];
+      el.innerHTML = '<strong>HealthAI Pro+:</strong><br/>' + escapeHtml(displayed);
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+      await new Promise(r => setTimeout(r, Math.min(25 + words[i].length * 6, 100)));
+    }
+    const time = new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
+    el.innerHTML = '<strong>HealthAI Pro+:</strong><br/>' + escapeHtml(text).replace(/\n/g,'<br>') + `
+      <div class="msg-actions">
+        <button class="action-btn copy-btn" title="Copy to clipboard">📋 Copy</button>
+      </div>
+      <div class="msg-time">${time}</div>`;
+    
+    // Copy button
+    el.querySelector('.copy-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('✅ Copied to clipboard');
+      });
+    });
+    
+    history.push({ from:'bot', text, ts:new Date().toISOString() });
+    localStorage.setItem('hap_history', JSON.stringify(history));
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+}
+
+function applyTheme(t) {
+  if (t === 'dark') {
+    document.documentElement.style.setProperty('--bg1', '#1a1f35');
+    document.documentElement.style.setProperty('--bg2', '#1e232e');
+    document.documentElement.style.setProperty('--card', '#252d3d');
+    document.documentElement.style.setProperty('--muted', '#cbd5e1');
+    document.documentElement.style.setProperty('--bubble', '#2d3a52');
+    document.documentElement.style.setProperty('--user-grad', 'linear-gradient(90deg,#0ea5e9,#3b82f6)');
+    document.documentElement.setAttribute('data-theme','dark');
+  } else {
+    document.documentElement.style.setProperty('--bg1', '#e6f3ff');
+    document.documentElement.style.setProperty('--bg2', '#ffffff');
+    document.documentElement.style.setProperty('--card', '#ffffff');
+    document.documentElement.style.setProperty('--muted', '#6b7280');
+    document.documentElement.style.setProperty('--bubble', '#f3fbff');
+    document.documentElement.style.setProperty('--user-grad', 'linear-gradient(90deg,#06b6d4,#3b82f6)');
+    document.documentElement.setAttribute('data-theme','light');
+  }
+  localStorage.setItem('hap_theme', t);
+}
+
+// Check if user is already logged in
+if (currentUser) {
+  enterApp();
+}
+</script>
+</body>
+</html>
